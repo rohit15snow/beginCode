@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<unload unload_date="2017-07-25 06:04:11">
+<sp_widget action="INSERT_OR_UPDATE">
+<client_script><![CDATA[function($scope) {
+	var c = this;
+	
+	if((c.data.table=='incident' && c.data.state_val ==7))
+		{
+		$scope.isVisible1=false;
+		$scope.isVisible2=false;
+		$scope.content="No Actions Available";
+	} //(c.data.state_val ==6 ||
+	else if((c.data.table=='incident' && c.data.state_val ==6))
+		{
+		$scope.isVisible1=false;
+		$scope.isVisible2=true;
+		//$scope.content="No Actions Available";
+	}
+	else if((c.data.table =='sc_req_item') && (c.data.state_val ==3 || c.data.state_val ==4 || c.data.state_val ==7)){ // all closed states
+		$scope.isVisible1=false;
+		$scope.isVisible2=false;
+		$scope.content="No Actions Available";
+	}
+	else{
+		$scope.isVisible1=true;
+	}
+	
+	c.uiAction = function(action) {
+		c.data.action = action;
+		var check = confirm('Do you really want to '+action+' the ticket?');
+		if(check==true){
+			c.server.update().then(function() {
+				
+				if(c.data.action == 'reopen'){
+					//$scope.content="No Actions Available";
+					$scope.isVisible1=true;
+					$scope.isVisible2=false;
+					//$scope.content="No Actions Available";
+				}
+				if(c.data.action == 'resolve'){
+					$scope.isVisible1=false;
+					if(c.data.table == 'sc_req_item'){ // check if request
+					$scope.isVisible2=false;
+					$scope.content="No Actions Available";
+					}
+					else{
+						$scope.isVisible2=true;
+					}
+				}
+				c.data.action = undefined;
+				console.log('INSIDE'+$scope.isVisible);
+			});
+			
+		}
+		else{
+			return false;
+		}
+		
+	};
+	//	 $scope.reloadPage = function(){window.location.reload();}
+	}]]></client_script>
+<controller_as>c</controller_as>
+<css/>
+<data_table>sp_instance</data_table>
+<demo_data/>
+<description>To keep a button on Ticket form.</description>
+<docs display_value=""/>
+<field_list/>
+<has_preview>false</has_preview>
+<id>bb-ticket-action</id>
+<internal>false</internal>
+<link/>
+<name>BB Ticket Actions</name>
+<option_schema/>
+<public>false</public>
+<roles/>
+<script><![CDATA[(function() {
+	var test = $sp.getRecord();
+	
+	data.table = input.table || $sp.getParameter("table");
+	data.sys_id = input.sys_id || $sp.getParameter("sys_id");
+	data.state_val = $sp.getField(test, 'state').value;
+
+	//gs.addInfoMessage('State'+ data.state_val);
+	gr = new GlideRecord(data.table);
+	if (!gr.isValid())
+		return;
+	
+	if (!gr.get(data.sys_id))
+		return;
+	
+	if (input && input.action) {
+		var action = input.action;
+		if (data.table == 'incident') {
+			if (action == 'resolve') {
+				gr.setValue('state', 6); //6 = resolved state
+				gr.work_notes = 'Closed by ' + gs.getUserDisplayName() + ' via Service Portal';
+				gr.setValue('closed_by', gs.getUserID());
+				gr.setValue('close_code', 'Self-Resolved');
+				gr.setValue('close_notes', 'Closed by Caller via Service Portal');
+				gr.update();
+				gs.addInfoMessage('Incident has been resolved');
+			}	
+			if (action == 'reopen') {
+				gr.setValue('state', 10); //6 = resolved state
+				gr.work_notes = 'Re-open ' + gs.getUserDisplayName() + ' via Service Portal';
+				//gr.setValue('closed_by', gs.getUserID());
+				//gr.setValue('close_code', 'Self-Resolved');
+				//gr.setValue('close_notes', 'Closed by Caller via Service Portal');
+				gr.update();
+				gs.addInfoMessage('Incident has been reopened');
+			}	
+		}
+		if(data.table == 'sc_req_item'){
+			if (action == 'resolve') {
+				gr.setValue('state', 7); //7 = Closed Skipped state
+				//use work_notes or comments depending on visibility
+				gr.work_notes = 'Closed by ' + gs.getUserDisplayName() + ' via Service Portal';
+				gr.setValue('closed_by', gs.getUserID());
+				//gr.setValue('close_code', 'Self-Resolved');
+				//gr.setValue('close_notes', 'Closed by Caller via Service Portal');
+				gr.update();
+				gs.addInfoMessage('Request has been closed');
+			}			
+		}
+	}
+})();]]></script>
+<servicenow>false</servicenow>
+<sys_class_name>sp_widget</sys_class_name>
+<sys_created_by>Rohit.Kumar</sys_created_by>
+<sys_created_on>2017-07-18 07:30:41</sys_created_on>
+<sys_customer_update>true</sys_customer_update>
+<sys_id>80eee9d913c80740d7b950782244b0bd</sys_id>
+<sys_mod_count>46</sys_mod_count>
+<sys_name>BB Ticket Actions</sys_name>
+<sys_package display_value="Global">global</sys_package>
+<sys_policy/>
+<sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+<sys_scope display_value="Global">global</sys_scope>
+<sys_update_name>sp_widget_80eee9d913c80740d7b950782244b0bd</sys_update_name>
+<sys_updated_by>Rohit.Kumar</sys_updated_by>
+<sys_updated_on>2017-07-21 09:58:38</sys_updated_on>
+<template><![CDATA[<div class="panel panel-default">
+ <div class="panel-heading">Actions</div>
+ <div class="panel-body">
+ <button type="button" class="btn btn-primary btn-block" id="resolve_button" ng-show = "isVisible1" ng-click="c.uiAction('resolve')">Close Ticket</button>
+ <button type="button" class="btn btn-primary btn-block" id ="reopen_button" ng-show = "isVisible2" ng-click="c.uiAction('reopen')">Reopen Ticket</button>
+<div ng-bind-html="content"></div>
+  </div>
+</div>]]></template>
+</sp_widget>
+</unload>
