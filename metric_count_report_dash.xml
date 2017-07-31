@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<unload unload_date="2017-07-31 05:11:27">
+<sys_ui_page action="INSERT_OR_UPDATE">
+<category>general</category>
+<client_script><![CDATA[function fetchData() {
+	var myGroup = document.getElementById('my_group').value;
+	var myFrom = document.getElementById('from_date').value;
+	var myTo = document.getElementById('to_date').value;
+	var my_state = document.getElementById('my_state').value;
+	//alert('from '+myFrom+' To '+myTo);
+	
+/*
+	var myFromArr  = myFrom.split('-');
+	var fromDt = myFromArr[2]+'-'+myFromArr[1]+'-'+myFromArr[0];
+	var myToArr  = myTo.split('-');
+	var toDt = myToArr[2]+'-'+myToArr[1]+'-'+myToArr[0];	
+	     var currentDateObj = new Date(fromDt); 
+	alert('converted Obj'+currentDateObj);
+         var fromDate = formatDate(currentDateObj, g_user_date_format); 
+	alert('converted fromDate'+fromDate);
+	var currentDateObj1 = new Date(toDt); 
+	alert('converted Obj1'+currentDateObj1);
+         var toDate = formatDate(currentDateObj1, g_user_date_format); 
+	alert('converted toDate'+toDate);	
+        // var currentDateNum = getDateFromFormat(currentDateStr, g_user_date_format); 
+	//alert('converted currentDateStr'+currentDateNum);
+	//return;
+	*/
+	
+	// alert('a '+fromDate+' TO Date '+toDate);
+	//alert('Group'+myGroup+'  '+fromDate+'  '+toDate);
+var ga = new GlideAjax('aahMetricsCalculation');
+ga.addParam('sysparm_name','calcMetric');
+ga.addParam('sysparm_group_name',myGroup);
+ga.addParam('sysparm_state_name',my_state);
+ga.addParam('sysparm_from_dt',myFrom);
+ga.addParam('sysparm_to_dt',myTo);
+
+//ga.addParam('sysparm_user_name',"Bob");
+ga.getXML(HelloWorldParse);
+//alert(ga.getAnswer());
+	
+	function HelloWorldParse(response) {
+
+   var answer = response.responseXML.documentElement.getAttribute('answer');
+   var ans = answer.split(',');
+				//alert('in Parse'+answer);
+		document.getElementById('min').innerHTML="Average Minutes: "+ans[0];
+		document.getElementById('hour').innerHTML="Average Hours: "+ans[1];
+		document.getElementById("record_link").href=ans[2];
+		//alert(answer);
+	}
+			 }
+]]></client_script>
+<description>To create a report for the AAH Metrics. The group average time in each state.</description>
+<direct>false</direct>
+<endpoint/>
+<html><![CDATA[<?xml version="1.0" encoding="utf-8" ?>
+
+     <j:jelly trim="false" xmlns:j="jelly:core" xmlns:g="glide" xmlns:j2="null" xmlns:g2="null">
+    <!--<g:requires name="scripts/GlideV2ChartingIncludes.js" includes="true"/>-->
+		
+		 <table style="width:500px">
+			 <tr><h3>Report finds the average of duration of states for the selected group</h3></tr>
+			<tr><h4>Select the group name and dates for the filter</h4></tr>
+	<tr><td style="width:200px"><b>Group Name</b>
+			<g:ui_reference name="my_group" id="my_group" table="sys_user_group" query="active=true" completer="AJAXTableCompleter" 
+columns="name,manager" style="width:300px"/></td></tr>
+			 <tr>  </tr><tr> </tr><br></br>
+			 <tr><b>Select State</b><select name="my_state" id="my_state">
+   <option value="New">New</option>
+  <option value="In Progress">In Progress</option>
+  <option value="On Hold">On Hold</option>
+</select></tr><br></br>
+			 <tr><b>From Date:</b> <g:ui_date name="from_date" id="from_date" value='' type="text" onfocus="(this.type='date')" onfocusout="(this.type='text')" /></tr>
+			 <tr><b>To Date:</b> <g:ui_date name="to_date" id="to_date" value='' type="text" onfocus="(this.type='date')" onfocusout="(this.type='text')" /></tr>
+			 
+			 </table><br></br>
+		 <button onclick="fetchData()"><b>Run Report</b></button> <br/>
+		<div style="height:100px; width:300px">
+			<a id='record_link' href=""><h4><div id='min'></div>	<br/>	 
+		<div id='hour'></div></h4> </a></div>
+     <!--<div id="report_stuff" style="height:500px; width:400px"/>      --> 
+		<!-- <script>
+			
+			 </script> -->
+		 
+     </j:jelly>]]></html>
+<name>report_aah_metricsCount</name>
+<processing_script/>
+<sys_class_name>sys_ui_page</sys_class_name>
+<sys_created_by>NagarroDev</sys_created_by>
+<sys_created_on>2017-07-08 17:59:07</sys_created_on>
+<sys_customer_update>true</sys_customer_update>
+<sys_id>e7ae58dedbf73a40c37a7e400f961936</sys_id>
+<sys_mod_count>115</sys_mod_count>
+<sys_name>report_aah_metricsCount</sys_name>
+<sys_package display_value="Global">global</sys_package>
+<sys_policy/>
+<sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+<sys_scope display_value="Global">global</sys_scope>
+<sys_update_name>sys_ui_page_e7ae58dedbf73a40c37a7e400f961936</sys_update_name>
+<sys_updated_by>NagarroDev</sys_updated_by>
+<sys_updated_on>2017-07-26 14:09:55</sys_updated_on>
+</sys_ui_page>
+</unload>

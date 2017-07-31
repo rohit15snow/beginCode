@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<unload unload_date="2017-07-31 05:11:50">
+<sys_ui_page action="INSERT_OR_UPDATE">
+<category>general</category>
+<client_script><![CDATA[function fetchData1() {
+	var myGroup = document.getElementById('my_group1').value;
+	var myFrom = document.getElementById('from_date1').value;
+	var myTo = document.getElementById('to_date1').value;
+	//var my_state = document.getElementById('my_state').value;
+	//alert('state'+my_state);
+	var myFromArr  = myFrom.split('-');
+	var fromDate = myFromArr[2]+'-'+myFromArr[1]+'-'+myFromArr[0];
+	var myToArr  = myTo.split('-');
+	var toDate = myToArr[2]+'-'+myToArr[1]+'-'+myToArr[0];
+	// alert('a '+fromDate+' TO Date '+toDate);
+	
+	
+	var queryFilter = "u_assignment_group="+myGroup+"^u_incident.sys_created_on>=javascript:gs.dateGenerate('"+fromDate+"','00:00:00')^u_incident.sys_created_on<=javascript:gs.dateGenerate('"+toDate+"','23:59:59')";
+	//	alert('Filter '+queryFilter);
+	var params = {sysparm_title: "AAH Custom Metrics - Bar", sysparm_field: "u_state", sysparm_type: "bar", sysparm_table: "u_aah_metrics", sysparm_aggregate: "AVG", sysparm_sumfield: "u_duration", sysparm_query:queryFilter};
+	var div = $j("#report_stuff1");
+	embedReportByParams(div, params);
+ 
+}]]></client_script>
+<description>To create a report for the AAH Metrics. The group average time in each state.</description>
+<direct>false</direct>
+<endpoint/>
+<html><![CDATA[<?xml version="1.0" encoding="utf-8" ?>
+
+     <j:jelly trim="false" xmlns:j="jelly:core" xmlns:g="glide" xmlns:j2="null" xmlns:g2="null">
+    <!--<g:requires name="scripts/GlideV2ChartingIncludes.js" includes="true"/> -->
+		
+		 <table style="width:500px">
+			 <tr><h3>Report finds the average of duration of states for the selected group</h3></tr>
+			<tr><h4>Select the group name and dates for the filter</h4></tr>
+	<tr><td style="width:200px"><b>Group Name</b>
+			<g:ui_reference name="my_group1" id="my_group1" table="sys_user_group" query="active=true" completer="AJAXTableCompleter" 
+columns="name,manager" style="width:300px"/></td></tr>
+			 <tr>  </tr><tr> </tr><br></br>
+			<!-- <tr><b>Select State</b><select name="my_state" id="my_state">
+   <option value="New">New</option>
+  <option value="In Progress">In Progress</option>
+  <option value="On Hold">On Hold</option>
+</select></tr> --> <br></br>
+			 <tr><b>From Date:</b> <g:ui_date name="from_date1" id="from_date1" value='' type="text" onfocus="(this.type='date')" onfocusout="(this.type='text')" /></tr>
+			 <tr><b>To Date:</b> <g:ui_date name="to_date1" id="to_date1" value='' type="text" onfocus="(this.type='date')" onfocusout="(this.type='text')" /></tr>
+			 
+			 </table><br></br>
+		 <button onclick="fetchData1()"><b>Run Report</b></button> <br/>
+     <div id="report_stuff1" style="height:300px; width:200px"/>     
+		<!-- <script>
+			
+			 </script> -->
+		 
+     </j:jelly>]]></html>
+<name>report_aah_metricsGraph</name>
+<processing_script/>
+<sys_class_name>sys_ui_page</sys_class_name>
+<sys_created_by>NagarroDev</sys_created_by>
+<sys_created_on>2017-07-13 05:34:04</sys_created_on>
+<sys_customer_update>true</sys_customer_update>
+<sys_id>1f34afabdbbf7a40c37a7e400f961946</sys_id>
+<sys_mod_count>9</sys_mod_count>
+<sys_name>report_aah_metricsGraph</sys_name>
+<sys_package display_value="Global">global</sys_package>
+<sys_policy/>
+<sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+<sys_scope display_value="Global">global</sys_scope>
+<sys_update_name>sys_ui_page_1f34afabdbbf7a40c37a7e400f961946</sys_update_name>
+<sys_updated_by>NagarroDev</sys_updated_by>
+<sys_updated_on>2017-07-13 05:49:34</sys_updated_on>
+</sys_ui_page>
+</unload>
